@@ -1,0 +1,10 @@
+﻿build/
+venv/
+*.zip
+*.pt
+*.pth
+__pycache__/
+.vscode/settings.json
+*.o
+*.so
+.DS_Store
