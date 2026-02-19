@@ -1,29 +1,43 @@
-﻿#include <torch/torch.h>
-#include <iostream>
+﻿#include <iostream>
+#include "vision/webcam.hpp"
+#include "utils/logger.hpp"
 
 using namespace std;
-int main() {
-    cout << "=== LibTorch 환경 테스트 ===" << endl;
-    cout << "LibTorch 버전: " << TORCH_VERSION << endl;
+using namespace vision;
+
+int main(int argc, char** argv) {
+    cout.setf(ios::unitbuf);
+    cerr.setf(ios::unitbuf);
     
-    // 간단한 텐서 생성 및 출력
-    torch::Tensor tensor = torch::rand({3, 4});
-    cout << "\n랜덤 텐서:" << endl;
-    cout << tensor << endl;
-    
-    // CUDA 사용 가능 여부 확인
-    if (torch::cuda::is_available()) {
-        cout << "\n✅ CUDA 사용 가능!" << endl;
-        cout << "CUDA 디바이스 수: " << torch::cuda::device_count() << endl;
-        
-        // GPU에 텐서 생성
-        torch::Tensor cuda_tensor = torch::rand({2, 3}).cuda();
-        cout << "CUDA 텐서:" << endl;
-        cout << cuda_tensor << endl;
-    } else {
-        cout << "\n⚠️  CUDA 사용 불가. CPU 모드로 동작합니다." << endl;
+    plog::logInfo("==========================================");
+    plog::logInfo("   Physical AI - Webcam Module           ");
+    plog::logInfo("==========================================");
+    plog::logInfo("OpenCV: " + string(CV_VERSION));
+
+    int cameraIndex = 0;
+    if (argc > 1) {
+        cameraIndex = atoi(argv[1]);
+        plog::logInfo("카메라 인덱스: " + to_string(cameraIndex));
     }
-    
-    cout << "\n🎉 환경 설정이 완료되었습니다!" << endl;
+
+    WebcamCapture webcam(cameraIndex, "Physical AI - Live");
+
+    WebcamError result = webcam.initialize();
+    if (result != WebcamError::SUCCESS) {
+        plog::logFatal(getErrorMessage(result));
+        plog::logError("해결 방법:");
+        plog::logError("1. 카메라 연결 확인");
+        plog::logError("2. 권한 설정: sudo chmod 666 /dev/video*");
+        plog::logError("3. 다른 인덱스 시도: ./main 1");
+        return static_cast<int>(result);
+    }
+
+    result = webcam.run();
+    if (result != WebcamError::SUCCESS) {
+        plog::logError(getErrorMessage(result));
+        return static_cast<int>(result);
+    }
+
+    plog::logInfo("정상 종료");
     return 0;
 }
