@@ -6,6 +6,7 @@ using namespace std;
 using namespace vision;
 
 int main(int argc, char** argv) {
+    // 출력 버퍼 즉시 플러시 설정
     cout.setf(ios::unitbuf);
     cerr.setf(ios::unitbuf);
     
