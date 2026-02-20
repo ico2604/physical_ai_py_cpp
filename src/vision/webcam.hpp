@@ -30,6 +30,8 @@ private:
     std::atomic<bool> isRunning;
     std::string windowName;
     bool mirrorMode;
+    bool contourMode;  // ★ 윤곽선 모드 추가
+    bool firstFrameLogged; // 첫 프레임 로그 여부
     
     // 멀티스레드용
     cv::Mat latestFrame;
@@ -45,6 +47,10 @@ private:
     void saveScreenshot(const cv::Mat& frame);
     cv::Mat convertToColor(const cv::Mat& frame);
     cv::Mat applyMirror(const cv::Mat& frame);
+    
+    // 윤곽선 처리 함수 추가
+    cv::Mat detectEdges(const cv::Mat& frame);
+    void drawContours(cv::Mat& frame, const cv::Mat& edges);
 
 public:
     WebcamCapture(int camIndex = 0, const std::string& winName = "Webcam Live");
@@ -60,10 +66,12 @@ public:
     void setResolution(int width, int height);
     void setWindowName(const std::string& name);
     void setMirrorMode(bool enable);
+    void setContourMode(bool enable); 
     
     bool isOpened() const;
     int getCameraIndex() const;
     bool isMirrorMode() const;
+    bool isContourMode() const; 
 };
 
 } // namespace vision
